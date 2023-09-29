@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Geolocalização MVP</title>
+  </head>
+  <body>
+    <h1>Geolocalização MVP</h1>
+    <button id="getLocationButton">Obter Localização</button>
+    <p>Latitude: <span id="latitude"></span></p>
+    <p>Longitude: <span id="longitude"></span></p>
+
+    <div id="locationInfo"></div>
+
+    <script>
+      const getLocationButton = document.getElementById("getLocationButton");
+      const latitudeSpan = document.getElementById("latitude");
+      const longitudeSpan = document.getElementById("longitude");
+      const locationInfoDiv = document.getElementById("locationInfo");
+
+      getLocationButton.addEventListener("click", () => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            (position) => {
+              const latitude = position.coords.latitude;
+              const longitude = position.coords.longitude;
+
+              // Exibindo as coordenadas na página
+              latitudeSpan.textContent = latitude;
+              longitudeSpan.textContent = longitude;
+
+              // Enviando coordenadas para o back-end
+              sendDataToBackend(latitude, longitude);
+            },
+            (error) => {
+              console.error("Erro ao obter geolocalização:", error);
+            }
+          );
+        } else {
+          console.error("Geolocalização não suportada neste navegador.");
+        }
+      });
+
+      function sendDataToBackend(latitude, longitude) {
+        fetch(`/getCoordinates?latitude=${latitude}&longitude=${longitude}`)
+          .then((response) => {
+            if (response.ok) {
+              return response.json();
+            }
+            throw new Error("Erro na solicitação ao servidor");
+          })
+          .then((data) => {
+            console.log(data);
+            // Exiba as informações recebidas do back-end no elemento locationInfoDiv
+            locationInfoDiv.innerHTML = `<h2>Informações de Localização</h2>
+                                                <p>País: ${data.address.country}</p>
+                                                <p>Cidade: ${data.address.city}</p>
+                                                <p>Código Postal: ${data.address.postcode}</p>`;
+          })
+          .catch((error) => {
+            console.error("Erro na solicitação ao servidor:", error);
+          });
+      }
+    </script>
+  </body>
+</html>
