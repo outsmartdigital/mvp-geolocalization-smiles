@@ -4,6 +4,8 @@ MVP da feature de geolocalização, sendo testado pelo squad Smiles
 
 # Execute
 
+npm i
+&
 npm run start
 
 # Visualizar Pagina
